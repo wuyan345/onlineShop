@@ -1,5 +1,8 @@
 package com.shop.controller.backend;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
@@ -28,28 +31,39 @@ public class GoodsManageController {
 	@Autowired
 	private LoginCheck loginCheck;
 	
-	@RequestMapping("/addGoods")
+	@RequestMapping(value = "/addGoods", method = RequestMethod.POST)
 	@ResponseBody
 	public Message addGoods(Goods goods, HttpSession session){
-		if(!loginCheck.check(session, Const.MANAGER))
-			return Message.errorMsg("未登录");
-		return null;
+//		if(!loginCheck.check(session, Const.MANAGER))
+//			return Message.errorMsg("未登录");
+		return iGoodsService.addGoods(goods);
 	}
 	
 	@RequestMapping(value = "/uploadImage", method = RequestMethod.POST)
 	@ResponseBody
 	public Message uploadImage(@RequestParam("upload_image")MultipartFile[] multipartFiles, HttpSession session){
-		if(!loginCheck.check(session, Const.MANAGER))
-			return Message.errorMsg("未登录");
+//		if(!loginCheck.check(session, Const.MANAGER))
+//			return Message.errorMsg("未登录");
 		return FTPUtil.upload(multipartFiles);
 	}
 
 	@RequestMapping(value = "/uploadRichText", method = RequestMethod.POST)
 	@ResponseBody
-	public Message uploadRichText(@RequestParam("upload_richText")MultipartFile[] multipartFiles, HttpSession session){
-		if(!loginCheck.check(session, Const.MANAGER))
-			return Message.errorMsg("未登录");
-		FTPUtil.upload(multipartFiles);
-		return null;
+	public Map uploadRichText(@RequestParam("upload_richText")MultipartFile[] multipartFiles, HttpSession session){
+//		if(!loginCheck.check(session, Const.MANAGER))
+//			return Message.errorMsg("未登录");
+		Message<List<String>> message = FTPUtil.upload(multipartFiles);
+		if(message.isSuccess()){
+			Map map = new HashMap<>();
+			map.put("success", true);
+			map.put("msg", "上传成功");
+			map.put("file_path", Const.HTTP_IMAGE_PREFIX + message.getData().get(0));
+			return map;
+		}else {
+			Map map = new HashMap<>();
+			map.put("success", false);
+			map.put("msg", "上传失败");
+			return map;
+		}
 	}
 }

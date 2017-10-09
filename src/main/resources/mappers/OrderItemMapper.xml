@@ -212,4 +212,12 @@
   	from order_item
   	where order_no = #{orderNo}
   </select>
+  <select id="batchSelectByOrderList" resultMap="BaseResultMap" parameterType="map">
+  	select <include refid="Base_Column_List" />
+  	from order_item
+  	where order_no in
+  	<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+  		#{item.orderNo}
+  	</foreach>
+  </select>
 </mapper>

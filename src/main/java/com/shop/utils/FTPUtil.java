@@ -19,9 +19,9 @@ public class FTPUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(FTPUtil.class);
 	
-	private static final String IP = "43.224.33.64";
+	private static final String IP = "120.78.77.242";
 	private static final String USERNAME = "ftpuser";
-	private static final String PASSWORD = "";
+	private static final String PASSWORD = "123456";
 	
 	public static Message<List<String>> upload(MultipartFile[] multipartFiles){
 		FTPClient ftpClient = new FTPClient();
@@ -36,7 +36,7 @@ public class FTPUtil {
 			List<String> fileNameList = new ArrayList<>();
 			for (MultipartFile multipartFile : multipartFiles) {
 				String[] names = multipartFile.getOriginalFilename().split("\\.");	// "."是转义字符
-				String fileName = UUID.randomUUID().toString() + names[names.length-1];
+				String fileName = UUID.randomUUID().toString() + "." + names[names.length-1];
 				boolean isSuccess = ftpClient.storeFile(fileName, multipartFile.getInputStream());
 				if(isSuccess == true)
 					fileNameList.add(fileName);

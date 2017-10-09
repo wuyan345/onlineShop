@@ -42,7 +42,7 @@ public class PayController {
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
 		String path = request.getSession().getServletContext().getRealPath("WEB-INF/upload");
-		return iPayService.pay(orderId, path);
+		return iPayService.pay(orderId, user.getId(), path);
 	}
 	
 	@RequestMapping("/alipayRefund")
@@ -71,10 +71,11 @@ public class PayController {
 				return Message.errorMsg("sign验证失败");
 		} catch (AlipayApiException e) {
 			logger.error("支付宝回调验证sign失败", e);
+			return Message.errorMsg("sign验证失败");
 		}
-//		Message message = iPayService.alipayCallback(map);
-//		if(message.isSuccess())
+		Message message = iPayService.alipayCallback(map);
+		if(message.isSuccess())
 			return Const.AlipayCallback.RESPONSE_SUCCESS;
-//		return Const.AlipayCallback.RESPONSE_FAILED;
+		return Const.AlipayCallback.RESPONSE_FAILED;
 	}
 }

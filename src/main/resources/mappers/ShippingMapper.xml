@@ -182,4 +182,17 @@
   	from shipping
   	where user_id = #{userId}
   </select>
+  <select id="checkShippingId" resultType="int" parameterType="map">
+  	select count(*) from shipping
+  	where id = #{shippingId}
+  	and user_id = #{userId}
+  </select>
+  <select id="batchSelectByOrderList" resultMap="BaseResultMap" parameterType="map">
+  	select <include refid="Base_Column_List"></include>
+  	from shipping
+  	where id in
+  	<foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+  		#{item.shippingId}
+  	</foreach>
+  </select>
 </mapper>

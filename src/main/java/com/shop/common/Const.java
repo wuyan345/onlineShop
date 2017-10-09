@@ -2,6 +2,8 @@ package com.shop.common;
 
 public class Const {
 
+	public static final String HTTP_IMAGE_PREFIX = "http://img.zxshopdemo.com/";
+	
 	public static final int SUCCESS = 0;
 	public static final int FAILED = 1;
 	
@@ -51,7 +53,14 @@ public class Const {
 	public interface AlipayCallback{
 		String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";
 		String TRADE_STATUS_TRADE_SUCCESS = "TRADE_SUCCESS";
+		String TRADE_STATUS_TRADE_FINISHED = "TRADE_FINISHED";
+		String TRADE_STATUS_TRADE_CLOSED = "TRADE_CLOSED";
 		String RESPONSE_SUCCESS = "success";
 		String RESPONSE_FAILED = "failed";
+	}
+	
+	public interface PayInfo{
+		int PAY_PLATFORM_ALIPAY = 1;
+		int PAY_PLATFORM_WECHAT = 2;
 	}
 }

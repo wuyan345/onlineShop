@@ -2,6 +2,7 @@ package com.shop.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -27,7 +28,10 @@ import com.shop.pojo.OrderItem;
 import com.shop.pojo.Shipping;
 import com.shop.pojo.User;
 import com.shop.service.IOrderService;
+import com.shop.service.IPayService;
 import com.shop.utils.BigDecimalUtil;
+import com.shop.utils.DateTimeUtil;
+import com.shop.vo.OrderVo;
 import com.shop.vo.PreOrderVo;
 
 @Service("iOrderService")
@@ -44,12 +48,14 @@ public class OrderServiceImpl implements IOrderService {
 	private ShippingMapper shippingMapper;
 	@Autowired
 	private OrderItemMapper orderItemMapper;
+	@Autowired
+	private IPayService iPayService;
 	
 	@Override
 	public Message preorder(User user) {
 		// cart、goods、shipping合并为一个类，让数据库返回到这个类
 		List<CartGoodsBo> cartGoodsBoList = cartMapper.querySelectedCartGoods(user.getId());
-		if(cartGoodsBoList.size() == 0)
+		if(cartGoodsBoList.isEmpty())
 			return Message.errorMsg("没有已勾选的购物车");
 		List<Shipping> shippingList = shippingMapper.selectByUserId(user.getId());
 		PreOrderVo preOrderVo = new PreOrderVo();
@@ -60,6 +66,13 @@ public class OrderServiceImpl implements IOrderService {
 
 	@Override
 	public Message generateOrder(Integer shippingId, User user) {
+		// 检测shippingId是否存在
+		if(shippingId == null)
+			return Message.errorMsg("缺少收货人信息");
+		// 检测shippingId是否属于该用户的
+		int count = shippingMapper.checkShippingId(shippingId, user.getId());
+		if(count <= 0)
+			return Message.errorMsg("收货人信息不属于该用户");
 		List<CartGoodsBo> cartGoodsBoList = cartMapper.querySelectedCartGoods(user.getId());
 		if(cartGoodsBoList.size() == 0)
 			return Message.errorMsg("无法生成订单，因没有已勾选的购物车");
@@ -72,7 +85,7 @@ public class OrderServiceImpl implements IOrderService {
 		order.setPaymentType(Const.PaymentType.PAY_ONLINE);
 		order.setPostage(new BigDecimal("0"));
 		order.setStatus(Const.OrderStatus.NOT_PAY);
-		int count = orderMapper.insert(order);
+		count = orderMapper.insert(order);
 		if(count <= 0)
 			return Message.errorMsg("生成订单失败");
 		// 为每个勾选购物车生成订单子表
@@ -87,6 +100,7 @@ public class OrderServiceImpl implements IOrderService {
 			orderItem.setName(cartGoodsBo.getName());
 			orderItem.setMainImage(cartGoodsBo.getMainImage());
 			orderItem.setDetail(cartGoodsBo.getDetail());
+			orderItem.setStatus(Const.OrderItemStatus.NORMAL);
 			orderItem.setPrice(cartGoodsBo.getGoodsPrice());
 			orderItem.setTotalPrice(BigDecimalUtil.mul(orderItem.getPrice().doubleValue(), 
 													orderItem.getQuantity().doubleValue()));
@@ -131,12 +145,13 @@ public class OrderServiceImpl implements IOrderService {
 	@Override
 	public Message saveOrEditAddress(Shipping shipping, User user) {
 		if(shipping.getId() == null){
+			shipping.setUserId(user.getId());
 			int count = shippingMapper.insert(shipping);
 			if(count <= 0)
 				return Message.errorMsg("保存地址失败");
 			return Message.successMsg("保存地址成功");
 		}else {
-			int count = shippingMapper.insertSelective(shipping);
+			int count = shippingMapper.updateByPrimaryKeySelective(shipping);
 			if(count <= 0)
 				return Message.errorMsg("编辑地址失败");
 			return Message.successMsg("编辑地址成功");
@@ -147,7 +162,31 @@ public class OrderServiceImpl implements IOrderService {
 	public Message listOrder(User user, int pageNum, int pageSize) {
 		PageHelper.startPage(pageNum, pageSize);
 		List<Order> orderList = orderMapper.selectByUserId(user.getId());
+		List<OrderItem> orderItemList = orderItemMapper.batchSelectByOrderList(orderList);
+		List<Shipping> shippingList = shippingMapper.batchSelectByOrderList(orderList);
+		List<OrderVo> orderVoList = new ArrayList<>();
+		for (Order order : orderList) {
+			OrderVo orderVo = new OrderVo();
+			orderVo.setOrder(order);
+			List<OrderItem> orderItemList2 = new ArrayList<>();
+			for (OrderItem orderItem : orderItemList) {
+				if(order.getId().equals(orderItem.getOrderId())){
+					orderItem.setDetail("");
+					orderItemList2.add(orderItem);
+				}
+			}
+			for (Shipping shipping : shippingList) {
+				if(order.getShippingId().equals(shipping.getId())){
+					orderVo.setShipping(shipping);
+					break;
+				}
+			}
+			orderVo.setOrderItemList(orderItemList2);
+			orderVo.setCreateTime(DateTimeUtil.dateToStr(order.getCreateTime()));
+			orderVoList.add(orderVo);
+		}
 		PageInfo pageInfo = new PageInfo<>(orderList);
+		pageInfo.setList(orderVoList);
 		return Message.successData(pageInfo);
 	}
 
@@ -170,7 +209,24 @@ public class OrderServiceImpl implements IOrderService {
 			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 			return Message.errorMsg("取消订单失败");
 		}
+		// 已付款未发货取消订单还要退款
+		if(order.getStatus() == Const.OrderStatus.PAID){
+			Message message = iPayService.refundForOrder(orderId);
+            newOrder.setId(orderId);
+            newOrder.setRefundTime((Date)message.getData());
+            count = orderMapper.updateByPrimaryKeySelective(newOrder);
+            if(count <= 0)
+            	return Message.errorMsg("更新订单失败");
+		}
 		return Message.successMsg("取消订单成功");
+	}
+
+	@Override
+	public Message getPaymentStatus(Integer orderId, Integer userId) {
+		Order order = orderMapper.selectByOrderIdUserId(orderId, userId);
+		if(order == null)
+			return Message.errorMsg("没有该订单");
+		return Message.successData(order.getStatus());
 	}
 	
 }

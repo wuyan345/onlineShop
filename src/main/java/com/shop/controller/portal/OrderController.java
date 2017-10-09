@@ -73,9 +73,11 @@ public class OrderController {
 		if(!loginCheck.check(session, Const.NORMAL_USER))
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		return iOrderService.listOrder(user, 1, 10);
+		return iOrderService.listOrder(user, 1, 1);
 	}
 	
+	// 1)未付款状态，用户可以取消订单
+	// 2)已付款未发货状态，用户可以取消订单（顺带退款）
 	@RequestMapping("/cancelOrder")
 	@ResponseBody
 	public Message cancelOrder(Integer orderId, HttpSession session){
@@ -85,7 +87,7 @@ public class OrderController {
 		return iOrderService.cancelOrder(orderId);
 	}
 	
-	// 已付款未发货的情况，申请退款
+	// 已付款未发货的情况，用户申请取消订单(顺带退款)
 	@RequestMapping("/applyRefund")
 	@ResponseBody
 	public Message applyRefund(Integer orderId, HttpSession session){
@@ -103,5 +105,15 @@ public class OrderController {
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
 		return null;
+	}
+	
+	// 前端支付页面获取是否付款的状态，以便跳转至“我的订单”页面
+	@RequestMapping("/getPaymentStatus")
+	@ResponseBody
+	public Message getPaymentStatus(Integer orderId, HttpSession session){
+		if(!loginCheck.check(session, Const.NORMAL_USER))
+			return Message.errorMsg("未登录或无权限");
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		return iOrderService.getPaymentStatus(orderId, user.getId());
 	}
 }

@@ -236,4 +236,10 @@
   	from <include refid = "table_order" />
   	where order_no = #{orderNo}
   </select>
+  <select id="selectByOrderIdUserId" resultMap="BaseResultMap" parameterType="map">
+  	select <include refid="Base_Column_List" />
+  	from <include refid = "table_order" />
+  	where user_id = #{userId}
+  	and id = #{orderId}
+  </select>
 </mapper>

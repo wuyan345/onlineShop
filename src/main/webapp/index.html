@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>在线商城</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+    	body{
+			/* padding-top:70px; */
+    		background-color: #eee;
+    	}
+    </style>
+  </head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+					<!-- Indicators -->
+					<ol class="carousel-indicators">
+						<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+						<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+						<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+					</ol>
+
+					<!-- Wrapper for slides -->
+					<div class="carousel-inner" role="listbox">
+						<div class="item active">
+							<img src="images/4-1.jpg" alt="">
+							<div class="carousel-caption"></div>
+						</div>
+						<div class="item">
+							<img src="images/7-1.jpg" alt="">
+							<div class="carousel-caption"></div>
+						</div>
+						<div class="item">
+							<img src="images/6-1.jpg" alt="">
+							<div class="carousel-caption"></div>
+						</div>
+					</div>
+
+					<!-- Controls -->
+					<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+						<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+						<span class="sr-only">Previous</span>
+					</a>
+					<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+						<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+						<span class="sr-only">Next</span>
+					</a>
+				</div>
+		</div>
+	</div>
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="index.html">WY商城</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul id ="nav-ul" class="nav navbar-nav navbar-right">
+					<li><p id="username" class="navbar-text" style="display:none;color:blue"></p></li>
+					<li id="login"><a href="login.html">请登录</a></li>
+					<li id="register"><a href="register.html">免费注册</a></li>
+					<li id="cart"><a href="cart.html">购物车</a></li>
+					<li><a href="order.html">我的订单</a></li>
+					<li><a href="editInfo.html">我的商城</a></li>
+					<li id="logout" style="display:none"><a href="logout.html">退出</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3 col-sm-3"></div>
+			<div class="col-md-6 col-sm-6">
+				<div class="input-group">
+					<input type="text" class="form-control" placeholder="商品名称">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button">搜索</button>
+					</span>
+				</div>
+			</div>
+			<div class="col-md-3"></div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row" style="padding-top:40px">
+			<div class="col-md-3 col-sm-3">
+				<div class="list-group">
+					<a href="goods_list.html?scId=0" class="list-group-item">家用电器</a> 
+					<a href="goods_list.html?scId=1" class="list-group-item">手机/运营商/数码</a> 
+					<a href="#" class="list-group-item">电脑/办公</a> 
+					<a href="#" class="list-group-item">家居/家具/家装/厨具</a> 
+					<a href="#" class="list-group-item">男装/女装/童装/内衣</a> 
+					<a href="#" class="list-group-item">美妆个护/宠物</a> 
+					<a href="#" class="list-group-item">女鞋/箱包/钟表/珠宝</a> 
+					<a href="#" class="list-group-item">男鞋/运动/户外</a> 
+					<a href="#" class="list-group-item">汽车/汽车用品</a> 
+					<a href="#" class="list-group-item">母婴/玩具乐器</a> 
+					<a href="#" class="list-group-item">食品/酒类/生鲜/特产</a> 
+					<a href="#" class="list-group-item">礼品鲜花/农资绿植</a> 
+					<a href="#" class="list-group-item">图书/音像/电子书</a>
+				</div>
+			</div>
+	
+			<div class="col-md-9">
+				<h2>商城热卖</h2>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="thumbnail">
+							<img src="images/2-1.jpg" alt="...">
+							<div class="caption">
+								<h3>Thumbnail label</h3>
+								<p>...</p>
+								<p>
+									<a href="#" class="btn btn-primary" role="button">Button</a>
+									<a href="#" class="btn btn-default" role="button">Button</a>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="thumbnail">
+							<img src="images/13.jpg" alt="...">
+							<div class="caption">
+								<h3>Thumbnail label</h3>
+								<p>...</p>
+								<p>
+									<a href="#" class="btn btn-primary" role="button">Button</a>
+									<a href="#" class="btn btn-default" role="button">Button</a>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="thumbnail">
+							<img src="images/12.jpg" alt="...">
+							<div class="caption">
+								<h3>Thumbnail label</h3>
+								<p>...</p>
+								<p>
+									<a href="#" class="btn btn-primary" role="button">Button</a>
+									<a href="#" class="btn btn-default" role="button">Button</a>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
+	
+	<!-- loginCheck.js -->
+	<script src="js/loginCheck.js"></script>
+</body>
+</html>

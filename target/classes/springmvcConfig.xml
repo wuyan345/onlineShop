@@ -20,6 +20,10 @@
 	<!-- 对静态资源访问 -->
 	<!-- 在location="/WEB-INF/js/"里的"/WEB-INF"不能少 -->
 	<mvc:resources location="/WEB-INF/js/" mapping="/js/**"></mvc:resources>
+	<mvc:resources location="/WEB-INF/css/" mapping="/css/**"></mvc:resources>
+	<mvc:resources location="/WEB-INF/fonts/" mapping="/fonts/**"></mvc:resources>
+	<mvc:resources location="/WEB-INF/images/" mapping="/images/**"></mvc:resources>
+	<mvc:resources location="/WEB-INF/simditor-2.3.6/" mapping="/simditor-2.3.6/**"></mvc:resources>
 	<!-- 静态资源访问处理 -->
     <mvc:default-servlet-handler/>
 	

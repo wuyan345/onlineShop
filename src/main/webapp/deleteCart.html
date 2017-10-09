@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <title>删除购物车</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  </head>
+<body>
+	
+	<script>
+		var cartId = GetQueryString("cartId");
+		$(document).ready(function(){
+			$.ajax({
+		        url: "cart/delete?cartId=" + cartId,
+		        type: "post",
+		        contentType: false,
+		        processData: false,
+		        dataType: "json",
+		        success: function(result) {
+		        	location.href = history.go(-1);
+				},
+				error: function(){
+					alert("error进入");
+				}
+			});
+		});
+		function GetQueryString(name){
+			var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+			var r = window.location.search.substr(1).match(reg);
+			if (r != null)
+				return unescape(r[2]);
+			return null;
+		}
+	</script>
+	
+</body>
+</html>

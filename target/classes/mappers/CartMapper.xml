@@ -165,7 +165,7 @@
   <select id="selectAllCartGoods" resultMap="CartGoodsBoResultMap" parameterType="integer">
   	select 
   		c.id, c.user_id as userId, c.goods_id as goodsId, c.quantity, c.selected, c.create_time as createTime, c.update_time as updateTime, 
-  		g.name, g.price, g.stock 
+  		g.name, g.price, g.stock, g.main_image as mainImage
   	from 
   		cart c left join goods g on c.goods_id = g.id
   	where c.user_id = #{userId}
@@ -224,5 +224,16 @@
     		#{item.cartId}
     	</foreach>
   	</where>
+  </delete>
+  <select id="selectCartByGoodsId" resultMap="BaseResultMap" parameterType="map">
+  	select <include refid="Base_Column_List" />
+  	from cart
+  	where user_id = #{userId}
+  	and goods_id = #{goodsId}
+  </select>
+  <delete id="deleteByCartIdUserId" parameterType="map">
+  	delete from cart
+  	where id = #{cartId}
+  	and user_id = #{userId}
   </delete>
 </mapper>

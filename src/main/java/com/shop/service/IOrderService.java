@@ -18,4 +18,6 @@ public interface IOrderService {
 	Message listOrder(User user, int pageNum, int pageSize);
 	
 	Message cancelOrder(Integer orderId);
+	
+	Message getPaymentStatus(Integer orderId, Integer userId);
 }

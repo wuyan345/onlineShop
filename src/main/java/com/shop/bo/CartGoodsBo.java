@@ -22,6 +22,8 @@ public class CartGoodsBo {
 
 	// goods
 	private String name;
+	
+	private String mainImage;
 
 	private BigDecimal price;
 
@@ -117,6 +119,14 @@ public class CartGoodsBo {
 
 	public void setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+
+	public String getMainImage() {
+		return mainImage;
+	}
+
+	public void setMainImage(String mainImage) {
+		this.mainImage = mainImage;
 	}
 
 	@Override

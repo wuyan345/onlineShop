@@ -29,15 +29,30 @@ public class CartServiceImpl implements ICartService {
 	private GoodsMapper goodsMapper;
 	
 	@Override
-	public Message addCart(User user, Integer goodsId) {
-		Cart cart = new Cart();
-		cart.setUserId(user.getId());
-		cart.setGoodsId(goodsId);
-		cart.setQuantity(1);
-		cart.setSelected(Const.Cart.UNSELECT);
-		int count = cartMapper.insert(cart);
-		if(count <= 0)
+	public Message addCart(User user, Integer goodsId, Integer goodsQuantity) {
+		// 控制商品数量
+		if(goodsQuantity <= 0 || goodsQuantity > 100)
 			return Message.errorMsg("加入购物车失败");
+		Cart oldCart = cartMapper.selectCartByGoodsId(user.getId(), goodsId);
+		if(oldCart != null){
+			// 购物车已存在，增加数量
+			Cart cart = new Cart();
+			cart.setId(oldCart.getId());
+			cart.setQuantity(oldCart.getQuantity() + goodsQuantity);
+			int count = cartMapper.updateByPrimaryKeySelective(cart);
+			if(count <= 0)
+				return Message.errorMsg("加入购物车失败");
+		}else{
+			// 新增购物车
+			Cart cart = new Cart();
+			cart.setUserId(user.getId());
+			cart.setGoodsId(goodsId);
+			cart.setQuantity(goodsQuantity);
+			cart.setSelected(Const.Cart.UNSELECT);
+			int count = cartMapper.insert(cart);
+			if(count <= 0)
+				return Message.errorMsg("加入购物车失败");
+		}
 		return Message.successMsg("已加入购物车");
 	}
 
@@ -58,8 +73,8 @@ public class CartServiceImpl implements ICartService {
 	private Message list(int userId){
 		// 数据库返回所有该用户已选中的购物车
 		List<CartGoodsBo> CartGoodsBoList = cartMapper.selectAllCartGoods(userId);
-		if(CartGoodsBoList.size() == 0)
-			return Message.successMsg("该用户购物车为空");
+		if(CartGoodsBoList.isEmpty())
+			return Message.errorMsg("该用户购物车为空");
 		// 查看选中商品库存足够否？
 		BigDecimal totalPrice = new BigDecimal("0");
 		for (CartGoodsBo cartGoodsBo : CartGoodsBoList) {
@@ -71,6 +86,7 @@ public class CartServiceImpl implements ICartService {
 				// 将已勾选的单个商品总价计入到整体总价里
 				totalPrice = BigDecimalUtil.add(totalPrice.doubleValue(), cartGoodsBo.getTotalPrice().doubleValue());
 			}
+			cartGoodsBo.setMainImage(Const.HTTP_IMAGE_PREFIX + cartGoodsBo.getMainImage());
 		}
 		CartGoodsVo cartGoodsVo = createCartGoodsVo(CartGoodsBoList, totalPrice);
 		return Message.successData(cartGoodsVo);
@@ -109,11 +125,20 @@ public class CartServiceImpl implements ICartService {
 			Cart newCart = new Cart();
 			newCart.setId(cart.getId());
 			newCart.setSelected(type);
-			int count = cartMapper.insertSelective(newCart);
+			int count = cartMapper.updateByPrimaryKeySelective(newCart);
 			if(count <= 0)
 				return Message.errorMsg("更新购物车失败");
 		}
 		return list(user.getId());
+	}
+
+	@Override
+	public Message delete(Integer cartId, User user) {
+		// 检查购物车是否属于该用户的
+		int count = cartMapper.deleteByCartIdUserId(user.getId(), cartId);
+		if(count <= 0)
+			return Message.errorMsg("删除购物车失败");
+		return Message.successMsg("删除购物车成功");
 	}
 	
 }

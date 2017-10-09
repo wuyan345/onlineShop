@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+
+    <title>页面测试</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  </head>
+<body>
+
+	<form>
+		<input id="chk0" name="chk" type="checkbox" value="518" onclick="aaa()">
+		<input id="chk1" name="chk" type="checkbox" value="519">
+		<input id="chk2" type="checkbox" onclick="bbb()">
+	</form>
+
+
+	<script>
+		function aaa(){
+			if ($("#chk1").attr("checked")) {
+				$("#chk1").removeAttr("checked");
+			} else {
+				$("#chk1").attr("checked","true");
+			}
+		}
+		function bbb(){
+			if ($("[name='chk']").prop("checked")) {
+				alert("true");
+				/* $("[type='checkbox']").prop("checked",true); */
+			}else{
+			/* 	$("[type='checkbox']").prop("checked",false); */
+			}
+		}
+ 		$(document).ready(function() {
+ 			$("#chk0").prop("checked",true);
+ 			$("#chk1").prop("checked",true);
+ 			if ($("[name='chk']").prop("checked")) {
+				alert("true");
+				/* $("[type='checkbox']").prop("checked",true); */
+			}else{
+				alert("false");
+			/* 	$("[type='checkbox']").prop("checked",false); */
+			}
+		});
+	</script>
+
+</body>
+</html>

@@ -25,9 +25,9 @@
 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
-		<property name="url" value="jdbc:mysql://your db ip:port/shop?allowMultiQueries=true&amp;characterEncoding=utf-8"></property>
-		<property name="username" value=""></property>
-		<property name="password" value=""></property>
+		<property name="url" value="jdbc:mysql://120.78.77.242:3306/shop?allowMultiQueries=true&amp;characterEncoding=utf-8"></property>
+		<property name="username" value="wy"></property>
+		<property name="password" value="123456"></property>
 		
 		<property name="maxActive" value="50"></property>
 		<!-- 最大建立连接等待时间。如果超过此时间将接到异常。设为－1表示无限制 -->
@@ -37,9 +37,25 @@
         <property name="defaultAutoCommit" value="true"></property>
 	</bean>
 	
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
-		p:dataSource-ref="dataSource"
-		p:mapperLocations="classpath*:mappers/*Mapper.xml"/>	<!-- classpath:xxx 和 classpath*:xxx是不一样的，前者表示引入一个，后者表示引入多个 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- classpath:xxx 和 classpath*:xxx是不一样的，前者表示引入一个，后者表示引入多个 -->
+		<property name="mapperLocations" value="classpath*:mappers/*Mapper.xml"></property>
+
+		<!-- 配置pageHelper拦截器插件 -->
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageHelper">
+					<property name="properties">
+						<!--使用下面的方式配置参数，一行配置一个 -->
+						<value>
+							dialect=mysql
+						</value>
+					</property>
+				</bean>
+			</array>
+		</property>
+	</bean>
 		
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>

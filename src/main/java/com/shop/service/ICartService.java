@@ -6,7 +6,7 @@ import com.shop.pojo.User;
 
 public interface ICartService {
 
-	Message addCart(User user, Integer goodsId);
+	Message addCart(User user, Integer goodsId, Integer goodsQuantity);
 	
 	Message changeQuantity(Integer cartId, int quantity, User user);
 	
@@ -20,4 +20,6 @@ public interface ICartService {
 	 * @return
 	 */
 	Message selectOrUnselect(User user, Integer cartId, int type);
+	
+	Message delete(Integer cartId, User user);
 }

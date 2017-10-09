@@ -16,4 +16,6 @@ public interface IUserService {
 	Message setNewPwd(String username, String password, String uuid);
 	
 	Message editInfo(User user);
+	
+	Message getAllInfo(User user);
 }

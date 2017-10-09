@@ -59,11 +59,11 @@ public class CartController {
 	
 	@RequestMapping("/addCart")
 	@ResponseBody
-	public Message addCart(Integer goodsId, HttpSession session){
+	public Message addCart(Integer goodsId, Integer goodsQuantity, HttpSession session){
 		if(!loginCheck.check(session, Const.NORMAL_USER))
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		return iCartService.addCart(user, goodsId);
+		return iCartService.addCart(user, goodsId, goodsQuantity);
 	}
 	
 	@RequestMapping("/listCart")
@@ -102,5 +102,14 @@ public class CartController {
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
 		return iCartService.selectOrUnselect(user, cartId, Const.Cart.UNSELECT);
+	}
+	
+	@RequestMapping("/delete")
+	@ResponseBody
+	public Message delete(Integer cartId, HttpSession session) {
+		if (!loginCheck.check(session, Const.NORMAL_USER))
+			return Message.errorMsg("未登录或无权限");
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		return iCartService.delete(cartId, user);
 	}
 }

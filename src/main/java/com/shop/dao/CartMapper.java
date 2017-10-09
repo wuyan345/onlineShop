@@ -59,4 +59,10 @@ public interface CartMapper {
     
     int batchDelete(List<com.shop.bo.order.CartGoodsBo> cartGoodsBoList);
     
+    /**
+     * 返回用户指定购物车
+     */
+    Cart selectCartByGoodsId(@Param("userId")Integer userId, @Param("goodsId")Integer goodsId);
+    
+    int deleteByCartIdUserId(@Param("userId")Integer userId, @Param("cartId")Integer cartId);
 }

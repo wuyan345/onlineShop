@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
@@ -32,14 +33,17 @@ import com.shop.common.Const;
 import com.shop.common.Message;
 import com.shop.dao.OrderItemMapper;
 import com.shop.dao.OrderMapper;
+import com.shop.dao.PayInfoMapper;
 import com.shop.pojo.Order;
 import com.shop.pojo.OrderItem;
+import com.shop.pojo.PayInfo;
 import com.shop.service.IPayService;
 import com.shop.utils.BigDecimalUtil;
 import com.shop.utils.DateTimeUtil;
 import com.shop.utils.FTPUtil;
 
 @Service("iPayService")
+@Transactional
 public class PayServiceImpl implements IPayService {
 
 	private static final Logger logger = LoggerFactory.getLogger(PayServiceImpl.class);
@@ -48,6 +52,8 @@ public class PayServiceImpl implements IPayService {
 	private OrderMapper orderMapper;
 	@Autowired
 	private OrderItemMapper orderItemMapper;
+	@Autowired
+	private PayInfoMapper payInfoMapper;
 	
 	// 支付宝当面付2.0服务
     private static AlipayTradeService   tradeService;
@@ -65,10 +71,10 @@ public class PayServiceImpl implements IPayService {
     }
 	
 	@Override
-	public Message pay(Integer orderId, String path) {
+	public Message pay(Integer orderId, Integer userId, String path) {
 		if(orderId == null)
 			return Message.errorMsg("订单id未填写");
-		Order order = orderMapper.selectByPrimaryKey(orderId);
+		Order order = orderMapper.selectByOrderIdUserId(orderId, userId);
 		if(order == null)
 			return Message.errorMsg("该订单不存在");
 		if(order.getStatus() != Const.OrderStatus.NOT_PAY)
@@ -79,7 +85,7 @@ public class PayServiceImpl implements IPayService {
         String outTradeNo = order.getOrderNo().toString();
 
         // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店当面付扫码消费”
-        String subject = new StringBuffer().append("shop扫二维码支付，订单号").append(outTradeNo).toString();
+        String subject = new StringBuffer().append("shop二维码支付，订单号").append(outTradeNo).toString();
 
         // (必填) 订单总金额，单位为元，不能超过1亿元
         // 如果同时传入了【打折金额】,【不可打折金额】,【订单总金额】三者,则必须满足如下条件:【订单总金额】=【打折金额】+【不可打折金额】
@@ -186,6 +192,9 @@ public class PayServiceImpl implements IPayService {
         }
     }
 
+    /**
+     * 该方法实现单个子订单退款
+     */
 	@Override
 	public Message refund(Integer orderId, Integer orderItemId) {
 		if(orderId == null)
@@ -254,6 +263,67 @@ public class PayServiceImpl implements IPayService {
         }
 	}
 	
+    /**
+     * 该方法实现订单整体退款
+     */
+	@Override
+	public Message refundForOrder(Integer orderId) {
+		if(orderId == null)
+			return Message.errorMsg("订单id未填写");
+		Order order = orderMapper.selectByPrimaryKey(orderId);
+		if(order == null)
+			return Message.errorMsg("该订单不存在");
+		if(order.getStatus() != Const.OrderStatus.REFUND)
+			return Message.errorMsg("该订单退款没申请或没批准");
+		
+		// (必填) 外部订单号，需要退款交易的商户外部订单号
+        String outTradeNo = order.getOrderNo().toString();
+
+        // (必填) 退款金额，该金额必须小于等于订单的支付金额，单位为元
+        String refundAmount = order.getPayment().toString();
+
+        // (可选，需要支持重复退货时必填) 商户退款请求号，相同支付宝交易号下的不同退款请求号对应同一笔交易的不同退款申请，
+        // 对于相同支付宝交易号下多笔相同商户退款请求号的退款交易，支付宝只会进行一次退款
+        String outRequestNo = order.getId().toString();
+
+        // (必填) 退款原因，可以说明用户退款原因，方便为商家后台提供统计
+        String refundReason = "用户不需要，正常退款";
+
+        // (必填) 商户门店编号，退款情况下可以为商家后台提供退款权限判定和统计等作用，详询支付宝技术支持
+        String storeId = "test_store_id";
+
+        // 创建退款请求builder，设置请求参数
+        AlipayTradeRefundRequestBuilder builder = new AlipayTradeRefundRequestBuilder()
+            .setOutTradeNo(outTradeNo).setRefundAmount(refundAmount).setRefundReason(refundReason)
+            .setOutRequestNo(outRequestNo).setStoreId(storeId);
+
+        AlipayF2FRefundResult result = tradeService.tradeRefund(builder);
+        switch (result.getTradeStatus()) {
+            case SUCCESS:
+                logger.info("支付宝退款成功: )");
+                AlipayTradeRefundResponse response = result.getResponse();
+//                if("N".equals(response.getFundChange()))
+//                	return Message.errorMsg("该订单重复退款，退款失败");
+                return Message.successData(response.getGmtRefundPay());
+//                break;
+
+            case FAILED:
+            	logger.error("支付宝退款失败!!!");
+            	return Message.errorMsg("支付宝退款失败!!!");
+//                break;
+
+            case UNKNOWN:
+            	logger.error("系统异常，订单退款状态未知!!!");
+            	return Message.errorMsg("系统异常，订单退款状态未知!!!");
+//                break;
+
+            default:
+            	logger.error("不支持的交易状态，交易返回异常!!!");
+            	return Message.errorMsg("不支持的交易状态，交易返回异常!!!");
+//                break;
+        }
+	}
+	
 	@Override
 	public Message alipayCallback(Map<String, String> map) {
 		long orderNo = Long.parseLong(map.get("out_trade_no"));
@@ -264,20 +334,69 @@ public class PayServiceImpl implements IPayService {
 		if(order == null)
 			return Message.errorMsg("没有该订单");
 		if("TRADE_SUCCESS".equals(status)){
-//			if()
-				if(order.getStatus() != Const.OrderStatus.NOT_PAY)
-					return Message.errorMsg("重复通知");
-				Order newOrder = new Order();
-				newOrder.setId(order.getId());
-				newOrder.setStatus(Const.OrderStatus.PAID);
-				newOrder.setPaymentTime(DateTimeUtil.strToDate(map.get("gmt_payment")));
-				int count = orderMapper.insertSelective(newOrder);
+			if(order.getStatus() != Const.OrderStatus.NOT_PAY)
+				return Message.errorMsg("重复通知");
+			Order newOrder = new Order();
+			newOrder.setId(order.getId());
+			newOrder.setStatus(Const.OrderStatus.PAID);
+			newOrder.setPaymentTime(DateTimeUtil.strToDate(map.get("gmt_payment")));
+			int count = orderMapper.updateByPrimaryKeySelective(newOrder);
+			if(count <= 0){
+				logger.info("订单修改失败");
+				return Message.errorMsg("订单修改失败");
+			}
+			PayInfo payInfo = new PayInfo();
+			payInfo.setOrderNo(orderNo);
+			payInfo.setUserId(order.getUserId());
+			payInfo.setPlatformNumber(tradeNo);
+			payInfo.setPayPlatform(Const.PayInfo.PAY_PLATFORM_ALIPAY);
+			payInfo.setPlatformStatus(Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS);
+			count = payInfoMapper.insert(payInfo);
+			if(count <= 0){
+				logger.info("支付信息新增失败");
+				return Message.errorMsg("支付信息新增失败");
+			}
+			return Message.success();
 		}else if("WAIT_BUYER_PAY".equals(status)){
+			logger.info("WAIT_BUYER_PAY: " + tradeNo);
 			return Message.success();
 		}else if("TRADE_FINISHED".equals(status)){
 			return Message.success();
+		}else if("TRADE_CLOSED".equals(status)){
+			if(order.getStatus() == Const.OrderStatus.NOT_PAY){
+				logger.info("orderNo: " + tradeNo + "超时未支付，订单关闭");
+				Order newOrder = new Order();
+				newOrder.setId(order.getId());
+				newOrder.setStatus(Const.OrderStatus.ORDER_CLOSE);
+				int count = orderMapper.updateByPrimaryKeySelective(newOrder);
+				if(count <= 0){
+					logger.info("订单修改失败");
+					return Message.errorMsg("订单修改失败");
+				}
+				return Message.success();
+			}else if(order.getStatus() >= Const.OrderStatus.PAID){
+				logger.info("orderNo: " + tradeNo + "支付完成后全额退款，订单关闭");
+				Order newOrder = new Order();
+				newOrder.setId(order.getId());
+				// 表明已退款，订单关闭
+				newOrder.setStatus(Const.OrderStatus.ORDER_CLOSE);
+				int count = orderMapper.updateByPrimaryKeySelective(newOrder);
+				if(count <= 0){
+					logger.info("订单修改失败");
+					return Message.errorMsg("订单修改失败");
+				}
+				PayInfo payInfo = payInfoMapper.selectByOrderNo(orderNo);
+				payInfo.setPlatformStatus(Const.AlipayCallback.TRADE_STATUS_TRADE_CLOSED);
+				count = payInfoMapper.updateByPrimaryKeySelective(payInfo);
+				if(count <= 0){
+					logger.info("支付信息修改失败");
+					return Message.errorMsg("支付信息修改失败");
+				}
+				return Message.success();
+			}
 		}
-		return Message.success();
+		logger.info("alipay回调参数trade_status错误: " + status);
+		return Message.errorMsg("alipay回调参数trade_status错误");
 	}
     
 }

@@ -27,7 +27,7 @@
     delete from user
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.shop.pojo.User">
+  <insert id="insert" parameterType="com.shop.pojo.User" useGeneratedKeys="true" keyProperty="id">
     insert into user (id, username, password, 
       phone, email, question, 
       answer, create_time, update_time

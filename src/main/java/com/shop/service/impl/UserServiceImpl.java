@@ -42,14 +42,13 @@ public class UserServiceImpl implements IUserService {
 		int count = userMapper.insert(user);
 		if(count <= 0)
 			return Message.errorMsg("注册失败");
-		User newUser = userMapper.selectByUsername(user.getUsername());
 		Level level = new Level();
 		Role role = new Role();
-		level.setUserId(newUser.getId());
+		level.setUserId(user.getId());
 		level.setLevel(1);
 		level.setExp(0);
-		role.setRoleNo(1);
-		role.setUserId(newUser.getId());
+		role.setRoleNo(Const.NORMAL_USER);
+		role.setUserId(user.getId());
 		levelMapper.insert(level);
 		roleMapper.insert(role);
 		return Message.successMsg("注册成功");
@@ -134,11 +133,30 @@ public class UserServiceImpl implements IUserService {
 
 	@Override
 	public Message editInfo(User user) {
-		// 如果有填写邮箱，检查是否有重复
+		//todo 如果有填写邮箱，检查是否有重复
+		//todo 问题与答案不能只写一个
+//		if(user.getQuestion() != null){
+//			if("".equals(user.getQuestion().trim())){
+//				
+//			}
+//		}
+//		if ((StringUtils.isNotBlank(user.getQuestion()) && StringUtils.isBlank(user.getAnswer()))
+//				|| (StringUtils.isBlank(user.getQuestion()) && StringUtils.isNotBlank(user.getAnswer()))) {
+//			return Message.errorMsg("问题与答案不能只写一个");
+//		}
 		int count = userMapper.updateByPrimaryKeySelective(user);
 		if(count <= 0)
 			return Message.errorMsg("更新个人资料失败");
 		return Message.successMsg("更新个人资料成功");
+	}
+
+	@Override
+	public Message getAllInfo(User user) {
+		User user2 = userMapper.selectByPrimaryKey(user.getId());
+		if(user2 == null)
+			return Message.errorMsg("用户信息获取失败");
+		user2.setPassword(StringUtils.EMPTY);
+		return Message.successData(user2);
 	}
 
 }

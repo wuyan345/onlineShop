@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.shop.common.Const;
@@ -34,23 +35,25 @@ public class UserController {
 //		response.addCookie(cookie);
 //	}
 	
-	@RequestMapping("/register")
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	@ResponseBody
 	public Message register(User user){
 		return iUserService.register(user);
 	}
 	
-	@RequestMapping("/login")
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ResponseBody
 	public Message login(String username, String password, HttpSession session){
 		Message message = iUserService.login(username, password);
 		if(message.isSuccess() == false)
 			return message;
 		session.setAttribute(Const.CURRENT_USER, message.getData());
+		// 设置过期时间: 2天
+		session.setMaxInactiveInterval(60 * 60 * 24 * 2);
 		return Message.successMsg("登录成功");
 	}
 	
-	@RequestMapping("/logout")
+	@RequestMapping(value = "/logout")
 	@ResponseBody
 	public Message logout(HttpSession session){
 		session.removeAttribute(Const.CURRENT_USER);
@@ -58,7 +61,7 @@ public class UserController {
 	}
 	
 	// 找回密码(1)，验证用户名是否存在，若存在则返回问题
-	@RequestMapping("/getUsername")
+	@RequestMapping(value = "/getUsername", method = RequestMethod.POST)
 	@ResponseBody
 	public Message getUsername(String username){
 		return iUserService.getUsername(username);
@@ -66,20 +69,20 @@ public class UserController {
 	
 	// 找回密码(2)，验证答案是否都正确
 	// 假设前端可以保存用户名
-	@RequestMapping("/getAnswer")
+	@RequestMapping(value = "/getAnswer", method = RequestMethod.POST)
 	@ResponseBody
 	public Message getAnswer(String username, String answer){
 		return iUserService.getAnswer(username, answer);
 	}
 	
 	// 找回密码(3)，设置新密码
-	@RequestMapping("/setNewPwd")
+	@RequestMapping(value = "/setNewPwd", method = RequestMethod.POST)
 	@ResponseBody
 	public Message setNewPwd(String username, String password, String uuid){
 		return iUserService.setNewPwd(username, password, uuid);
 	}
 	
-	@RequestMapping("/editInfo")
+	@RequestMapping(value = "/editInfo", method = RequestMethod.POST)
 	@ResponseBody
 	public Message editInfo(User user, HttpSession session){
 		if(!loginCheck.check(session, Const.NORMAL_USER))
@@ -90,5 +93,23 @@ public class UserController {
 		user.setUsername(StringUtils.EMPTY);
 		user.setPassword(StringUtils.EMPTY);
 		return iUserService.editInfo(user);
+	}
+	
+	@RequestMapping(value = "/getInfo", method = RequestMethod.POST)
+	@ResponseBody
+	public Message getInfo(HttpSession session){
+		if(!loginCheck.check(session, Const.NORMAL_USER))
+			return Message.errorMsg("未登录或无权限");
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		return Message.successData(user);
+	}
+	
+	@RequestMapping(value = "/getAllInfo", method = RequestMethod.POST)
+	@ResponseBody
+	public Message getAllInfo(HttpSession session){
+		if(!loginCheck.check(session, Const.NORMAL_USER))
+			return Message.errorMsg("未登录或无权限");
+		User user = (User) session.getAttribute(Const.CURRENT_USER);
+		return iUserService.getAllInfo(user);
 	}
 }

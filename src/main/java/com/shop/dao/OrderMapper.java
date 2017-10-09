@@ -2,6 +2,8 @@ package com.shop.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.shop.pojo.Order;
 
 public interface OrderMapper {
@@ -20,4 +22,6 @@ public interface OrderMapper {
     List<Order> selectByUserId(Integer userId);
     
     Order selectByOrderNo(Long orderNo);
+    
+    Order selectByOrderIdUserId(@Param("orderId")Integer orderId, @Param("userId")Integer userId);
 }

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>购物车</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+	
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+		body {
+			padding-top: 100px;
+		}
+		
+		.margin-top-20 {
+			margin-top: 20px;
+		}
+		
+		.reduce {
+			left: 0;
+		}
+		
+		.plus {
+			border-left-color: transparent;
+			right: 0;
+		}
+	</style>
+  </head>
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="index.html">在线商城</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul id="nav-ul" class="nav navbar-nav navbar-right">
+					<li><p id="username" class="navbar-text" style="display:none;color:blue"></p></li>
+					<li id="login"><a href="login.html">登录</a></li>
+					<li id="register"><a href="register.html">注册</a></li>
+					<li><a href="order.html">我的订单</a></li>
+					<li><a href="editInfo.html">我的商城</a></li>
+					<li id="logout" style="display:none"><a href="logout.html">退出</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<div  class="container">
+		<div id="emptyCart" class="row" style="display:none">
+			<h3 style="color:red"><strong>你的购物车还是空的，赶紧行动吧！</strong></h3>
+		</div>
+		<div id="start" class="row">
+			<div class="col-md-1 col-sm-1"></div>
+			<div class="col-md-2 col-sm-2">
+				<input id="chkForAll" type="checkbox" onclick="checkboxEvt(&quot;chkForAll&quot;)">全选
+			</div>
+			<div class="col-md-1 col-sm-1">商品</div>
+			<div class="col-md-2 col-sm-2"></div>
+			<div class="col-md-1 col-sm-1"><div class="pull-right">单价</div></div>
+			<div class="col-md-2 col-sm-2">
+				<div class="col-md-offset-4">数量</div>
+			</div>
+			<div class="col-md-1 col-sm-1">小计</div>
+			<div class="col-md-1 col-sm-1">操作</div>
+		</div>
+<!-- 		<div id="0-div0" class="row">
+			<div id="0-div1" class="col-md-1 col-sm-1"></div>
+			<div id="0-div2" class="col-md-2 col-sm-2">
+				<input id="0-input0" type="checkbox">
+				<img id="0-img0" alt="" src="images/3.jpg" width="100px">
+			</div>
+			<div id="0-div3" class="col-md-3 col-sm-3 margin-top-20">
+				<strong>尚都比拉2013冬装新款女装 韩版修身呢子大衣 秋冬气质羊毛呢外套</strong>
+			</div>
+			<div id="0-div4" class="col-md-1 margin-top-20">
+				<div id="0-div5" class="pull-right">5999.00</div>
+			</div>
+			<div id="0-div6" class="col-md-2 col-sm-2 margin-top-20">
+				<div id="0-div7" class="input-group input-group-sm col-md-offset-4">
+					<span id="0-span0" class="input-group-btn">
+						<button id="0-btn0" class="btn btn-default" type="button">-</button>
+					</span>
+					<input id="0-input1" type="text" class="form-control" value="2">
+					<span id="0-span1" class="input-group-btn">
+						<button id="0-btn1" class="btn btn-default" type="button">+</button>
+					</span>
+				</div>
+			</div>
+			<div id="0-div8" class="col-md-1 margin-top-20">11998.00</div>
+			<div id="0-div9" class="col-md-1 margin-top-20">
+				<a id="0-a0" href="#">删除</a>
+			</div>
+			<div id="0-div10" class="col-md-1"></div>
+		</div> -->
+		
+		<div id="createOrder" class="row" style="margin-top:50px">
+			<div class="col-md-1"></div>
+			<div class="col-md-10">
+				<div class="pull-right">
+					<span>总价:</span><span style="color:red"><strong id="totalPrice"></strong></span>
+					<button type="button" class="btn btn-danger" style="margin-left:50px" onclick="goPay()">去结算</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
+	
+	<!-- loginCheck.js -->
+	<!-- <script src="js/loginCheck.js"></script> -->
+	<!-- cart.js -->
+	<script src="js/cart.js"></script>
+</body>
+</html>

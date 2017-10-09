@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.shop.common.Const;
 import com.shop.common.Message;
 import com.shop.dao.GoodsMapper;
 import com.shop.pojo.Goods;
@@ -22,6 +23,14 @@ public class GoodsServiceImpl implements IGoodsService {
 
 	@Autowired
 	private GoodsMapper goodsMapper;
+
+	@Override
+	public Message addGoods(Goods goods) {
+		int count = goodsMapper.insert(goods);
+		if(count <= 0)
+			return Message.errorMsg("添加商品失败");
+		return Message.successMsg("添加商品成功");
+	}
 
 	@Override
 	public Message<PageInfo> list(Integer categoryId, int pageNum, int pageSize) {
@@ -46,8 +55,7 @@ public class GoodsServiceImpl implements IGoodsService {
 	private GoodsDetailVo createGoodsDetailVo(Goods goods){
 		GoodsDetailVo goodsDetailVo = new GoodsDetailVo();
 		goodsDetailVo.setGoods(goods);
-		//todo imgHost
-		goodsDetailVo.setImgHost("");
+		goodsDetailVo.setImgHost(Const.HTTP_IMAGE_PREFIX);
 		return goodsDetailVo;
 	}
 	

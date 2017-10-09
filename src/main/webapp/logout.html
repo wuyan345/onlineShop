@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <title>登出</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  </head>
+<body>
+	
+	<script>
+		$(document).ready(function(){
+			$.ajax({
+		        url: "user/logout",
+		        type: "post",
+		        contentType: false,
+		        processData: false,
+		        dataType: "json",
+		        success: function(result) {
+		        	location.href = history.go(-1);
+				},
+				error: function(){
+					alert("error进入");
+				}
+			});
+		});
+	</script>
+	
+</body>
+</html>

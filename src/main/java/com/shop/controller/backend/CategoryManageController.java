@@ -37,12 +37,12 @@ public class CategoryManageController {
 		return null;
 	}
 	
-	// 返回某一根节点下的所有二级子节点，三级子节点不返回
+	// 返回某一根节点下的所有二级子节点，三级子节点不返回（若有的话）
 	@RequestMapping("/getChrildrenCategory")
 	@ResponseBody
 	public Message getChrildrenCategory(int categoryId, HttpSession session) {
-		if(!loginCheck.check(session, Const.MANAGER))
-			return Message.errorMsg("未登录或无权限");
+//		if(!loginCheck.check(session, Const.MANAGER))
+//			return Message.errorMsg("未登录或无权限");
 		return iCategoryService.getChrildrenCategory(categoryId);
 	}
 
