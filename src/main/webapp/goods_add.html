@@ -42,9 +42,11 @@
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<p class="navbar-text">后台管理</p>
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-				<ul class="nav navbar-nav navbar-right">
-					<li><a href="login.html">登录</a></li>
-					<li><a href="register.html">注册</a></li>
+				<ul id ="nav-ul" class="nav navbar-nav navbar-right">
+					<li><p id="username" class="navbar-text" style="display:none;color:blue"></p></li>
+					<li id="login"><a href="login.html">登录</a></li>
+					<li id="register"><a href="register.html">注册</a></li>
+					<li id="logout" style="display:none"><a href="logout.html">退出</a></li>
 				</ul>
 			</div>
 			<!-- /.navbar-collapse -->
@@ -134,7 +136,8 @@
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
+	<script src="js/jquery-1.12.4.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="js/bootstrap.min.js"></script>
 	<!-- Simditor -->

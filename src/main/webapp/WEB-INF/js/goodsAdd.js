@@ -1,6 +1,42 @@
 var imageName = "";
+var userInfoJson = null;
 
 $(document).ready(function(){
+	
+	$.ajax({
+        url: "manage/user/getInfo",
+        type: "post",
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function(result) {
+        	userInfoJson = result;
+        	showUserName();
+		},
+		error: function(){
+			alert("error进入");
+		}
+	});
+	$.ajax({
+        url: "manage/category/getChrildrenCategory?categoryId=0",
+        type: "get",
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function(result) {
+        	var i = 0;
+        	for( ; result.data[i]; i++){
+        		var parent = document.getElementById("selectA");
+        		var optNode = document.createElement("option");
+        		optNode.setAttribute("value", result.data[i].id);
+        		optNode.innerHTML = result.data[i].name;
+        		parent.appendChild(optNode);
+        	}
+		},
+		error: function(){
+			alert("error进入");
+		}
+	});
 	//初始化文本编辑器
 	var editor = new Simditor({
 		//textarea的id
@@ -87,29 +123,6 @@ function formSubmit(){
     });
 }
 
-$(document).ready(function(){
-	$.ajax({
-        url: "manage/category/getChrildrenCategory?categoryId=0",
-        type: "get",
-        contentType: false,
-        processData: false,
-        dataType: "json",
-        success: function(result) {
-        	var i = 0;
-        	for( ; result.data[i]; i++){
-        		var parent = document.getElementById("selectA");
-        		var optNode = document.createElement("option");
-        		optNode.setAttribute("value", result.data[i].id);
-        		optNode.innerHTML = result.data[i].name;
-        		parent.appendChild(optNode);
-        	}
-		},
-		error: function(){
-			alert("error进入");
-		}
-	});
-});
-
 function btnChange(value) {
 	$.ajax({
         url: "manage/category/getChrildrenCategory?categoryId=" + value,
@@ -155,4 +168,18 @@ function btnChange(value) {
 			alert("error进入");
 		}
 	});
+}
+
+function showUserName(){
+	if($.isEmptyObject(userInfoJson))
+		return;
+	if(userInfoJson.status == 1)
+		location.href = "login.html";
+	// 删除login、register节点
+	document.getElementById("nav-ul").removeChild(document.getElementById("login"));
+	document.getElementById("nav-ul").removeChild(document.getElementById("register"));
+	
+	document.getElementById("username").style.display = "";
+	document.getElementById("logout").style.display = "";
+	document.getElementById("username").innerHTML = "你好，管理员" + userInfoJson.data.username;
 }

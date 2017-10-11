@@ -11,16 +11,18 @@
       <arg column="quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="main_image" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="detail" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="price" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
       <arg column="total_price" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
+      <arg column="refund_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
       <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
       <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, user_id, order_id, goods_id, order_no, quantity, name, main_image, detail, price, 
-    total_price, create_time, update_time
+    id, user_id, order_id, goods_id, order_no, quantity, name, main_image, status, detail, 
+    price, total_price, refund_time, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -35,14 +37,16 @@
   <insert id="insert" parameterType="com.shop.pojo.OrderItem">
     insert into order_item (id, user_id, order_id, 
       goods_id, order_no, quantity, 
-      name, main_image, detail, 
-      price, total_price, create_time, 
-      update_time)
+      name, main_image, status, 
+      detail, price, total_price, 
+      refund_time, create_time, update_time
+      )
     values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{orderId,jdbcType=INTEGER}, 
       #{goodsId,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, #{quantity,jdbcType=INTEGER}, 
-      #{name,jdbcType=VARCHAR}, #{mainImage,jdbcType=VARCHAR}, #{detail,jdbcType=VARCHAR}, 
-      #{price,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, now(), 
-      now())
+      #{name,jdbcType=VARCHAR}, #{mainImage,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{detail,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{totalPrice,jdbcType=DECIMAL}, 
+      #{refundTime,jdbcType=TIMESTAMP}, now(), now()
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.shop.pojo.OrderItem">
     insert into order_item
@@ -71,6 +75,9 @@
       <if test="mainImage != null">
         main_image,
       </if>
+      <if test="status != null">
+        status,
+      </if>
       <if test="detail != null">
         detail,
       </if>
@@ -79,6 +86,9 @@
       </if>
       <if test="totalPrice != null">
         total_price,
+      </if>
+      <if test="refundTime != null">
+        refund_time,
       </if>
       <if test="createTime != null">
         create_time,
@@ -112,6 +122,9 @@
       <if test="mainImage != null">
         #{mainImage,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
       <if test="detail != null">
         #{detail,jdbcType=VARCHAR},
       </if>
@@ -120,6 +133,9 @@
       </if>
       <if test="totalPrice != null">
         #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="refundTime != null">
+        #{refundTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createTime != null">
         now(),
@@ -153,6 +169,9 @@
       <if test="mainImage != null">
         main_image = #{mainImage,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
       <if test="detail != null">
         detail = #{detail,jdbcType=VARCHAR},
       </if>
@@ -161,6 +180,9 @@
       </if>
       <if test="totalPrice != null">
         total_price = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="refundTime != null">
+        refund_time = #{refundTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -180,9 +202,11 @@
       quantity = #{quantity,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
       main_image = #{mainImage,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
       detail = #{detail,jdbcType=VARCHAR},
       price = #{price,jdbcType=DECIMAL},
       total_price = #{totalPrice,jdbcType=DECIMAL},
+      refund_time = #{refundTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
@@ -191,14 +215,14 @@
   <insert id="batchInsert" parameterType="list">
   	insert into order_item (id, user_id, order_id, 
       goods_id, order_no, quantity, 
-      name, main_image, detail, 
-      price, total_price, create_time, 
+      name, main_image, status, detail, 
+      price, total_price, refund_time, create_time, 
       update_time)
     values 
     <foreach collection="list" item="item" index="index" separator=",">
     	(
     		#{item.id}, #{item.userId}, #{item.orderId}, #{item.goodsId}, #{item.orderNo}, #{item.quantity}, 
-      		#{item.name}, #{item.mainImage}, #{item.detail}, #{item.price}, #{item.totalPrice}, now(), now()
+      		#{item.name}, #{item.mainImage}, #{item.status}, #{item.detail}, #{item.price}, #{item.totalPrice}, #{item.refundTime}, now(), now()
     	)
     </foreach>
   </insert>

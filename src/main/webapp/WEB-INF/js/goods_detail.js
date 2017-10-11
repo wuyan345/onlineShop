@@ -30,7 +30,7 @@ function sub(){
 	var cartNum = parseInt(document.getElementById("cartNum").value);
 	if(cartNum == 2){
 		document.getElementById("cartNum").value = cartNum - 1;
-		document.getElementById("btn-sub").setAttribute("disabled", "true");
+		document.getElementById("btn-sub").setAttribute("disabled", "disabled");
 	}else if(cartNum > 2)
 		document.getElementById("cartNum").value = cartNum - 1;
 }

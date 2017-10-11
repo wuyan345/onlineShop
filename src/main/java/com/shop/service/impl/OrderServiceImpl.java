@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ import com.shop.vo.PreOrderVo;
 @Transactional
 public class OrderServiceImpl implements IOrderService {
 
+	private final static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+	
 	@Autowired
 	private CartMapper cartMapper;
 	@Autowired
@@ -162,6 +166,9 @@ public class OrderServiceImpl implements IOrderService {
 	public Message listOrder(User user, int pageNum, int pageSize) {
 		PageHelper.startPage(pageNum, pageSize);
 		List<Order> orderList = orderMapper.selectByUserId(user.getId());
+		if(orderList.isEmpty()){
+			return Message.errorMsg("该用户没有订单");
+		}
 		List<OrderItem> orderItemList = orderItemMapper.batchSelectByOrderList(orderList);
 		List<Shipping> shippingList = shippingMapper.batchSelectByOrderList(orderList);
 		List<OrderVo> orderVoList = new ArrayList<>();
@@ -170,12 +177,14 @@ public class OrderServiceImpl implements IOrderService {
 			orderVo.setOrder(order);
 			List<OrderItem> orderItemList2 = new ArrayList<>();
 			for (OrderItem orderItem : orderItemList) {
+				// 查找与order对应的子订单
 				if(order.getId().equals(orderItem.getOrderId())){
 					orderItem.setDetail("");
 					orderItemList2.add(orderItem);
 				}
 			}
 			for (Shipping shipping : shippingList) {
+				// 查找与order对应的收货信息
 				if(order.getShippingId().equals(shipping.getId())){
 					orderVo.setShipping(shipping);
 					break;
@@ -195,13 +204,16 @@ public class OrderServiceImpl implements IOrderService {
 		Order order = orderMapper.selectByPrimaryKey(orderId);
 		if(order == null)
 			return Message.errorMsg("没有该订单");
+		// 保存原来的status
+		int status = order.getStatus();
 		// 发了货就不能取消订单
 		if(order.getStatus() >= Const.OrderStatus.SHIPPED)
 			return Message.errorMsg("不能取消");
 		List<OrderItem> orderItemList = orderItemMapper.selectQuantityByOrderNo(order.getOrderNo());
 		Order newOrder = new Order();
 		newOrder.setId(orderId);
-		newOrder.setStatus(Const.OrderStatus.ORDER_CANCEL);
+		newOrder.setStatus(Const.OrderStatus.ORDER_CLOSE);
+		newOrder.setCloseTime(new Date());
 		orderMapper.updateByPrimaryKeySelective(newOrder);
 		// 补回库存
 		int count = goodsMapper.batchUpdateQuantityForCancelOrder(orderItemList);
@@ -210,8 +222,13 @@ public class OrderServiceImpl implements IOrderService {
 			return Message.errorMsg("取消订单失败");
 		}
 		// 已付款未发货取消订单还要退款
-		if(order.getStatus() == Const.OrderStatus.PAID){
+		if(status == Const.OrderStatus.PAID){
 			Message message = iPayService.refundForOrder(orderId);
+			if(!message.isSuccess()){
+				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+				logger.error("已回滚，错误原因： " + message.getMsg());
+				return Message.errorMsg("取消订单失败");
+			}
             newOrder.setId(orderId);
             newOrder.setRefundTime((Date)message.getData());
             count = orderMapper.updateByPrimaryKeySelective(newOrder);

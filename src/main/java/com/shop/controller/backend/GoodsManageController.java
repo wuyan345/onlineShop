@@ -34,24 +34,28 @@ public class GoodsManageController {
 	@RequestMapping(value = "/addGoods", method = RequestMethod.POST)
 	@ResponseBody
 	public Message addGoods(Goods goods, HttpSession session){
-//		if(!loginCheck.check(session, Const.MANAGER))
-//			return Message.errorMsg("未登录");
+		if(!loginCheck.check(session, Const.MANAGER))
+			return Message.errorMsg("未登录");
 		return iGoodsService.addGoods(goods);
 	}
 	
 	@RequestMapping(value = "/uploadImage", method = RequestMethod.POST)
 	@ResponseBody
 	public Message uploadImage(@RequestParam("upload_image")MultipartFile[] multipartFiles, HttpSession session){
-//		if(!loginCheck.check(session, Const.MANAGER))
-//			return Message.errorMsg("未登录");
+		if(!loginCheck.check(session, Const.MANAGER))
+			return Message.errorMsg("未登录");
 		return FTPUtil.upload(multipartFiles);
 	}
 
 	@RequestMapping(value = "/uploadRichText", method = RequestMethod.POST)
 	@ResponseBody
 	public Map uploadRichText(@RequestParam("upload_richText")MultipartFile[] multipartFiles, HttpSession session){
-//		if(!loginCheck.check(session, Const.MANAGER))
-//			return Message.errorMsg("未登录");
+		if(!loginCheck.check(session, Const.MANAGER)){
+			Map map = new HashMap<>();
+			map.put("success", false);
+			map.put("msg", "未登录");
+			return map;
+		}
 		Message<List<String>> message = FTPUtil.upload(multipartFiles);
 		if(message.isSuccess()){
 			Map map = new HashMap<>();

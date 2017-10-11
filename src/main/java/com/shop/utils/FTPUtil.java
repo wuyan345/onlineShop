@@ -19,9 +19,9 @@ public class FTPUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(FTPUtil.class);
 	
-	private static final String IP = "120.78.77.242";
-	private static final String USERNAME = "ftpuser";
-	private static final String PASSWORD = "123456";
+	private static final String IP = PropertiesUtil.getProperty("ftp.ip");
+	private static final String USERNAME = PropertiesUtil.getProperty("ftp.username");
+	private static final String PASSWORD = PropertiesUtil.getProperty("ftp.password");
 	
 	public static Message<List<String>> upload(MultipartFile[] multipartFiles){
 		FTPClient ftpClient = new FTPClient();

@@ -62,8 +62,10 @@ public class PayController {
 		for( ; iter.hasNext(); ){
 			String paramName = iter.next();
 			map.put(paramName, request.getParameter(paramName));
-			logger.info(paramName + ": " + request.getParameter(paramName));
+//			logger.info(paramName + ": " + request.getParameter(paramName));
 		}
+		logger.info("alipay异步通知, out_trade_no: " + map.get("out_trade_no"));
+		logger.info("alipay异步通知, trade_status: " + map.get("trade_status"));
 		map.remove("sign_type");
 		try {
 			boolean alipayRSACheckV2 = AlipaySignature.rsaCheckV2(map, Configs.getAlipayPublicKey(), "utf-8", AlipayConstants.SIGN_TYPE_RSA2);

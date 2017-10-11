@@ -73,7 +73,7 @@ public class OrderController {
 		if(!loginCheck.check(session, Const.NORMAL_USER))
 			return Message.errorMsg("未登录或无权限");
 		User user = (User) session.getAttribute(Const.CURRENT_USER);
-		return iOrderService.listOrder(user, 1, 1);
+		return iOrderService.listOrder(user, 1, 10);
 	}
 	
 	// 1)未付款状态，用户可以取消订单

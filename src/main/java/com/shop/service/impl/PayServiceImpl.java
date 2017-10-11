@@ -141,7 +141,7 @@ public class PayServiceImpl implements IPayService {
             .setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
             .setOperatorId(operatorId).setStoreId(storeId).setExtendParams(extendParams)
             .setTimeoutExpress(timeoutExpress)
-            .setNotifyUrl("http://32cx8m.natappfree.cc/shop/pay/alipayCallback")//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
+            .setNotifyUrl("http://vdd8r7.natappfree.cc/shop/pay/alipayCallback")//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
             .setGoodsDetailList(goodsDetailList);
 
 
@@ -273,8 +273,8 @@ public class PayServiceImpl implements IPayService {
 		Order order = orderMapper.selectByPrimaryKey(orderId);
 		if(order == null)
 			return Message.errorMsg("该订单不存在");
-		if(order.getStatus() != Const.OrderStatus.REFUND)
-			return Message.errorMsg("该订单退款没申请或没批准");
+		if(order.getStatus() == Const.OrderStatus.NOT_PAY)
+			return Message.errorMsg("该订单没付款，不能退款");
 		
 		// (必填) 外部订单号，需要退款交易的商户外部订单号
         String outTradeNo = order.getOrderNo().toString();
@@ -342,7 +342,7 @@ public class PayServiceImpl implements IPayService {
 			newOrder.setPaymentTime(DateTimeUtil.strToDate(map.get("gmt_payment")));
 			int count = orderMapper.updateByPrimaryKeySelective(newOrder);
 			if(count <= 0){
-				logger.info("订单修改失败");
+				logger.error("订单修改失败");
 				return Message.errorMsg("订单修改失败");
 			}
 			PayInfo payInfo = new PayInfo();
@@ -353,7 +353,7 @@ public class PayServiceImpl implements IPayService {
 			payInfo.setPlatformStatus(Const.AlipayCallback.TRADE_STATUS_TRADE_SUCCESS);
 			count = payInfoMapper.insert(payInfo);
 			if(count <= 0){
-				logger.info("支付信息新增失败");
+				logger.error("支付信息新增失败");
 				return Message.errorMsg("支付信息新增失败");
 			}
 			return Message.success();
@@ -370,7 +370,7 @@ public class PayServiceImpl implements IPayService {
 				newOrder.setStatus(Const.OrderStatus.ORDER_CLOSE);
 				int count = orderMapper.updateByPrimaryKeySelective(newOrder);
 				if(count <= 0){
-					logger.info("订单修改失败");
+					logger.error("订单修改失败");
 					return Message.errorMsg("订单修改失败");
 				}
 				return Message.success();
@@ -382,20 +382,20 @@ public class PayServiceImpl implements IPayService {
 				newOrder.setStatus(Const.OrderStatus.ORDER_CLOSE);
 				int count = orderMapper.updateByPrimaryKeySelective(newOrder);
 				if(count <= 0){
-					logger.info("订单修改失败");
+					logger.error("订单修改失败");
 					return Message.errorMsg("订单修改失败");
 				}
 				PayInfo payInfo = payInfoMapper.selectByOrderNo(orderNo);
 				payInfo.setPlatformStatus(Const.AlipayCallback.TRADE_STATUS_TRADE_CLOSED);
 				count = payInfoMapper.updateByPrimaryKeySelective(payInfo);
 				if(count <= 0){
-					logger.info("支付信息修改失败");
+					logger.error("支付信息修改失败");
 					return Message.errorMsg("支付信息修改失败");
 				}
 				return Message.success();
 			}
 		}
-		logger.info("alipay回调参数trade_status错误: " + status);
+		logger.error("alipay回调参数trade_status错误: " + status);
 		return Message.errorMsg("alipay回调参数trade_status错误");
 	}
     

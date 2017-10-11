@@ -38,10 +38,10 @@ public class Const {
 		int PAID = 1;
 		int SHIPPED = 2;
 		int RECEIVED_GOODS = 3;
+		// 由管理员来确认退款
 		int REFUND = 4;
 		int TRADE_SUCCESS = 5;
 		int ORDER_CLOSE = 6;
-		int ORDER_CANCEL = 7;
 	}
 	
 	public interface OrderItemStatus{

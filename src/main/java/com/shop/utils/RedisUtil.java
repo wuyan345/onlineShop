@@ -12,9 +12,9 @@ public class RedisUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisUtil.class);
 	
-	private static final String IP = "172.31.189.8";
-	private static final int PORT = 6379;
-	private static final String PASSWORD = "v1RjVmtAyiXvPu6xXodUozXG63wKUzyp";
+	private static final String IP = PropertiesUtil.getProperty("redis.ip");
+	private static final int PORT = Integer.valueOf(PropertiesUtil.getProperty("redis.port"));
+	private static final String PASSWORD = PropertiesUtil.getProperty("redis.password");
 	private static JedisPool pool = new JedisPool(new JedisPoolConfig(), IP, PORT, 1000, PASSWORD);
 	
 	
@@ -22,7 +22,7 @@ public class RedisUtil {
 		Jedis jedis = null;
 		try {
 			jedis = pool.getResource();
-			/// ... do stuff here ... for example
+			/// ... do stuff here ...
 			return jedis;
 		} catch (JedisException e) {
 			logger.error("连接redis失败", e);
@@ -61,7 +61,7 @@ public class RedisUtil {
 		return val;
 	}
 	
-//	public static void main(String[] args) {
-//		System.out.println(RedisUtil.getKey("foo"));
-//	}
+	public static void main(String[] args) {
+		System.out.println(RedisUtil.getKey("foo"));
+	}
 }

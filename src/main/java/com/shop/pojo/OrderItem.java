@@ -20,21 +20,21 @@ public class OrderItem {
 
     private String mainImage;
 
-    private String detail;
-    
     private Integer status;
+
+    private String detail;
 
     private BigDecimal price;
 
     private BigDecimal totalPrice;
-    
+
     private Date refundTime;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public OrderItem(Integer id, Integer userId, Integer orderId, Integer goodsId, Long orderNo, Integer quantity, String name, String mainImage, String detail, BigDecimal price, BigDecimal totalPrice, Date createTime, Date updateTime) {
+    public OrderItem(Integer id, Integer userId, Integer orderId, Integer goodsId, Long orderNo, Integer quantity, String name, String mainImage, Integer status, String detail, BigDecimal price, BigDecimal totalPrice, Date refundTime, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.orderId = orderId;
@@ -43,9 +43,11 @@ public class OrderItem {
         this.quantity = quantity;
         this.name = name;
         this.mainImage = mainImage;
+        this.status = status;
         this.detail = detail;
         this.price = price;
         this.totalPrice = totalPrice;
+        this.refundTime = refundTime;
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
@@ -118,6 +120,14 @@ public class OrderItem {
         this.mainImage = mainImage == null ? null : mainImage.trim();
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     public String getDetail() {
         return detail;
     }
@@ -142,6 +152,14 @@ public class OrderItem {
         this.totalPrice = totalPrice;
     }
 
+    public Date getRefundTime() {
+        return refundTime;
+    }
+
+    public void setRefundTime(Date refundTime) {
+        this.refundTime = refundTime;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -157,20 +175,4 @@ public class OrderItem {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
-	public Date getRefundTime() {
-		return refundTime;
-	}
-
-	public void setRefundTime(Date refundTime) {
-		this.refundTime = refundTime;
-	}
 }
