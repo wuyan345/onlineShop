@@ -15,5 +15,5 @@
 ![](https://github.com/wuyan345/onlineShop/raw/master/readme-img/生成订单.jpg)
 二维码支付页
 ![](https://github.com/wuyan345/onlineShop/raw/master/readme-img/付款.jpg)
-订单详情页
+订单列表页
 ![](https://github.com/wuyan345/onlineShop/raw/master/readme-img/订单详情.jpg)
