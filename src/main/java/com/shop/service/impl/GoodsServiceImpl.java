@@ -63,9 +63,9 @@ public class GoodsServiceImpl implements IGoodsService {
 	public Message<PageInfo> searchGoods(String keyword, int pageNum, int pageSize) {
 		if(StringUtils.isBlank(keyword))
 			return Message.errorMsg("参数错误");
-		PageHelper.startPage(pageNum, pageSize);
 		keyword = "%" + keyword + "%";
 		List<Goods> goodsList = new ArrayList<>();
+		PageHelper.startPage(pageNum, pageSize);
 		goodsList = goodsMapper.selectByKeyword(keyword);
 		PageInfo pageInfo = new PageInfo<>(goodsList);
 		return Message.successData(pageInfo);

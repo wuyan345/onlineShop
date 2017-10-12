@@ -70,9 +70,9 @@
 			<div class="col-md-3 col-sm-3"></div>
 			<div class="col-md-6 col-sm-6">
 				<div class="input-group">
-					<input type="text" class="form-control" placeholder="商品名称">
+					<input id="input-search" type="text" class="form-control" placeholder="商品名称">
 					<span class="input-group-btn">
-						<button class="btn btn-default" type="button">搜索</button>
+						<button id="btn-search" class="btn btn-default" type="button">搜索</button>
 					</span>
 				</div>
 			</div>
@@ -95,6 +95,7 @@
 				</div>
 			</div>
 		</div>
+		<h3 id="notice" style="color:red" hidden="hidden">很抱歉，没有找到你需要的商品。</h3>
 		<div id="start" class="row" style="padding-top:10px">
 			<!-- <div id="0-div0" class="col-md-3">
 				<div id="0-div1" class="thumbnail">

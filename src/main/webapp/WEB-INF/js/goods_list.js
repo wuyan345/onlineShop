@@ -44,6 +44,15 @@ $(document).ready(function(){
 		getGoodsListData(100064);	// 礼品
 	if(scId == 12)
 		getGoodsListData(100120);	// 文艺
+	var keyword = GetQueryString("keyword");
+	if(keyword != null){
+		getSearchListData(keyword);
+	}
+	
+	$("#btn-search").click(function(){
+		var keyword = $("#input-search").val();
+		location.href = "goods_list.html?keyword=" + keyword;
+	});
 });
 
 function getGoodsListData(categoryId){
@@ -70,7 +79,8 @@ function showGoodsList(){
 		return;
 	}
 	if($.isEmptyObject(goodsListJson.data.list)){
-		alert("很抱歉，没有找到您需要的商品。");
+//		alert("很抱歉，没有找到您需要的商品。");
+		$("#notice").removeAttr("hidden");
 		return;
 	}
 	
@@ -81,7 +91,7 @@ function showGoodsList(){
 		var name = goodsListJson.data.list[i].name;
 		var imgSrc = imgHost + goodsListJson.data.list[i].mainImage;
 		var price = goodsListJson.data.list[i].price;
-		var href = "http://127.0.0.1:10001/shop/goods_detail.html?goodsId=" + gid;
+		var href = "goods_detail.html?goodsId=" + gid;
 		
 		// 0-div0
 		$("#start").append($("<div></div>").attr({"id":gid+"-div0", "class":"col-md-3"}));
@@ -102,6 +112,26 @@ function showGoodsList(){
 	}
 }
 
+function getSearchListData(keyword){
+	var formData = new FormData();
+	formData.append("keyword", keyword);
+	$.ajax({
+        url: "goods/searchGoods",
+        type: "post",
+        data: formData,
+        contentType: false,
+        processData: false,
+        dataType: "json",
+        success: function(result) {
+        	goodsListJson = result;
+        	showGoodsList();
+		},
+		error: function(){
+			alert("error进入");
+		}
+	});
+}
+
 function showUserName(){
 	if($.isEmptyObject(userInfoJson))
 		return;
@@ -116,10 +146,8 @@ function showUserName(){
 	document.getElementById("username").innerHTML = "你好，" + userInfoJson.data.username;
 }
 
-function GetQueryString(name){
-	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-	var r = window.location.search.substr(1).match(reg);
-	if (r != null)
-		return unescape(r[2]);
-	return null;
+function GetQueryString(key) {
+	var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+	var result = window.location.search.substr(1).match(reg);
+	return result ? decodeURIComponent(result[2]) : null;
 }

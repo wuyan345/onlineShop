@@ -1,10 +1,12 @@
 package com.shop.controller.portal;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.pagehelper.PageInfo;
@@ -38,7 +40,7 @@ public class GoodsController {
 	}
 	
 	// keyword模糊搜索或id精确搜索，keyword和id只能有其中一个
-	@RequestMapping("/searchGoods")
+	@RequestMapping(value = "/searchGoods", method = RequestMethod.POST)
 	@ResponseBody
 	public Message<PageInfo> searchGoods(String keyword, Integer goodsId){
 		return iGoodsService.searchGoods(keyword, 1, 10);
