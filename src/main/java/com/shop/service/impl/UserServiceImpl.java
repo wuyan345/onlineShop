@@ -1,9 +1,14 @@
 package com.shop.service.impl;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,8 @@ import com.shop.utils.RedisUtil;
 @Transactional()
 public class UserServiceImpl implements IUserService {
 
+	private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+	
 	@Autowired
 	private UserMapper userMapper;
 	@Autowired
@@ -34,14 +41,19 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public Message register(User user) {
 		// 注册时用户名、密码必填，其余选填
-		if(checkValid(Const.USERNAME, user.getUsername()) == false)
+		if(!checkValid(Const.USERNAME, user.getUsername()))
 			return Message.errorMsg("用户名格式错误");
-		if(checkValid(Const.PASSWORD, user.getPassword()) == false)
+		if(!checkValid(Const.PASSWORD, user.getPassword()))
 			return Message.errorMsg("密码格式错误");
 		user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
-		int count = userMapper.insert(user);
-		if(count <= 0)
-			return Message.errorMsg("注册失败");
+		try{
+			int count = userMapper.insert(user);
+			if(count <= 0)
+				return Message.errorMsg("注册失败");
+		}catch (DuplicateKeyException e) {
+			logger.error("注册的用户名{}在数据库重名", user.getUsername());
+			return Message.errorMsg("用户名已被注册");
+		}
 		Level level = new Level();
 		Role role = new Role();
 		level.setUserId(user.getId());
@@ -58,14 +70,18 @@ public class UserServiceImpl implements IUserService {
 		if(type.equals(Const.USERNAME)){
 			if(StringUtils.isBlank(value))
 				return false;
-			//todo 检测用户名格式
-			return true;
+			// 检测用户名格式
+			if(formatCheck(value, Const.FormatValid.USERNAME))
+				return true;
+			return false;
 		}
 		if(type.equals(Const.PASSWORD)){
 			if(StringUtils.isBlank(value))
 				return false;
-			//todo 检测密码格式
-			return true;
+			// 检测密码格式
+			if(formatCheck(value, Const.FormatValid.PASSWORD))
+				return true;
+			return false;
 		}
 		if(type.equals(Const.PHONE)){
 			if(StringUtils.isBlank(value))
@@ -77,10 +93,19 @@ public class UserServiceImpl implements IUserService {
 			if(StringUtils.isBlank(value))
 				return false;
 			//todo 检测邮箱格式
-			return true;
+			if(formatCheck(value, Const.FormatValid.EMAIL))
+				return true;
+			return false;
 		}
 		// type不正确
 		return false;
+	}
+	
+	private boolean formatCheck(String str, String type){
+		Pattern pattern = Pattern.compile(type);
+		Matcher matcher = pattern.matcher(str);
+//		System.out.println(matcher.matches());
+		return matcher.matches();
 	}
 	
 	@Override

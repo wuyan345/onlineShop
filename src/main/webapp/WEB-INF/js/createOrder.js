@@ -190,6 +190,10 @@ function showPreorder(){
 }
 
 function generateOrder(){
+	if(shippingId == null){
+		alert("缺少收货信息");
+		return false;
+	}
 	$.ajax({
         url: "order/generateOrder?shippingId="+shippingId,
         type: "get",

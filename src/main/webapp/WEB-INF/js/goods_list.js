@@ -94,7 +94,7 @@ function showGoodsList(){
 		var href = "goods_detail.html?goodsId=" + gid;
 		
 		// 0-div0
-		$("#start").append($("<div></div>").attr({"id":gid+"-div0", "class":"col-md-3"}));
+		$("#start").append($("<div></div>").attr({"id":gid+"-div0", "class":"col-md-3 col-sm-3"}));
 		// 0-div1
 		$("#"+gid+"-div0").append($("<div></div>").attr({"id":gid+"-div1", "class":"thumbnail"}));
 		// 0-img0

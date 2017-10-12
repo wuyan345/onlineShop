@@ -17,7 +17,7 @@
 		        processData: false,
 		        dataType: "json",
 		        success: function(result) {
-		        	location.href = history.go(-1);
+		        	history.go(-1);
 				},
 				error: function(){
 					alert("error进入");

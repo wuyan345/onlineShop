@@ -38,7 +38,7 @@ public class MD5Util {
     }
 
     public static String MD5EncodeUtf8(String origin) {
-        origin = origin + Const.MD5_SALT_VALUE;
+        origin = origin + PropertiesUtil.getProperty("md5.salt.value");
         return MD5Encode(origin, "utf-8");
     }
 
@@ -47,6 +47,6 @@ public class MD5Util {
             "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
 
     public static void main(String[] args) {
-		System.out.println(new MD5Util().MD5EncodeUtf8("123"));
+		System.out.println(MD5Util.MD5EncodeUtf8("12"));
 	}
 }

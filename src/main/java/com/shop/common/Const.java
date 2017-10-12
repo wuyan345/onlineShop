@@ -16,7 +16,14 @@ public class Const {
 	public static final String PHONE = "phone";
 	public static final String EMAIL = "email";
 	
-	public static final String MD5_SALT_VALUE = "TtcB5Wa9";
+	public interface FormatValid{
+		// 字母、数字组合，4-10个字符
+		String USERNAME = "^[0-9a-zA-Z]{4,10}$";
+		// 字母、数字组合，6-20个字符
+		String PASSWORD = "^[0-9a-zA-Z]{6,10}$";
+		// xxx@xxx.xxx
+		String EMAIL = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_-]+$";
+	}
 	
 	public interface Category{
 		int NORMAL = 0;
